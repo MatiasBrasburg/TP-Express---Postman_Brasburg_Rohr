@@ -28,21 +28,30 @@ app.get('/validarfecha/:ano/:mes/:dia', (req, res) => {
     }
 });
 
+
+
+
+//b1
 app.get('/matematica/sumar', async (req, res) => {                
     let resultado = await sumar(req.query.n1, req.query.n2);
     res.status(200).send(`el resultado de la operacion es: ${resultado}`);
 });
 
+
+//b2
 app.get('/matematica/restar', async (req, res) => {                
     let resultado = await restar(req.query.n1, req.query.n2);
     res.status(200).send(`el resultado de la operacion es: ${resultado}`);
 });
 
+//b3
 app.get('/matematica/multiplicar', async (req, res) => {                
     let resultado = await multiplicar(req.query.n1, req.query.n2);
     res.status(200).send(`el resultado de la operacion es: ${resultado}`);
 });
 
+
+//b4
 app.get('/matematica/dividir', async (req, res) => {                
     if (req.query.n2 == 0) {
         res.status(400).send(`el divisor no puede ser 0`);
@@ -51,7 +60,11 @@ app.get('/matematica/dividir', async (req, res) => {
         res.status(200).send(`el resultado de la operacion es: ${resultado}`);
     }
 });
-//c3 
+
+
+
+
+//c1
 app.get('/omdb/searchbypage', async (req, res) => {                
     let resultado = await OMDBSearchByPage[req.query.search, req.query.p];
     res.status(200).send(`el resultado de la operacion es: ${resultado}`);
