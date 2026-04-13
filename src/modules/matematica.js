@@ -1,6 +1,7 @@
 /* Este es el módulo "matematicas" */
 const PI = 3.14;
 function sumar(x, y) {
+    let n1
 return x + y;
 }
 function restar(x, y) {
