@@ -1,9 +1,9 @@
 export default class alumno 
 {
-    constructor(nombre, apellido, edad)
+    constructor(nombre, dni, edad)
     {
         this.nombre = nombre;
-        this.apellido = apellido;
+        this.dni = dni;
         this.edad = edad;
     }
 
