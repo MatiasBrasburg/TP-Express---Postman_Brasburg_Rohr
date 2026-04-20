@@ -4,6 +4,8 @@ import { sumar, restar, dividir, multiplicar } from "./src/modules/matematica.js
 import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./omdb-wrapped.js";
 import Alumno from "./alumno.js";
 import ValidacionesHelper from "./ValidacionesHelper.js"; // Asumo que lo guardaste en la misma carpeta base
+import DateTimeHelper from "./DateTimeHelper.js";
+
 
 const app = express();
 const port = 3000;            
@@ -93,7 +95,7 @@ app.get('/matematica/dividir', async (req, res) => {
 //c1
 app.get('/omdb/searchbypage', async (req, res) => {                
     // 🛡️ HELPER: Limpiamos la búsqueda y la página
-    const search = ValidacionesHelper.getStringOrDefault(req.query.search, '');
+    const search = ValidacionesHelper.getStringOrDefault(req.query.search, 'nada');
     const p = ValidacionesHelper.getIntegerOrDefault(req.query.p, 1);
 
     if (search === '') return res.status(400).send('El parámetro search es obligatorio');
@@ -104,7 +106,7 @@ app.get('/omdb/searchbypage', async (req, res) => {
 
 //c2
 app.get('/omdb/searchcomplete', async (req, res) => {                
-    const search = ValidacionesHelper.getStringOrDefault(req.query.search, '');
+    const search = ValidacionesHelper.getStringOrDefault(req.query.search, 'nada');
     if (search === '') return res.status(400).send('El parámetro search es obligatorio');
 
     let resultado = await OMDBSearchComplete(search); 
@@ -113,7 +115,7 @@ app.get('/omdb/searchcomplete', async (req, res) => {
 
 //c3
 app.get('/omdb/getbyomdbid', async (req, res) => {
-    const id = ValidacionesHelper.getStringOrDefault(req.query.imdbID, '');
+    const id = ValidacionesHelper.getStringOrDefault(req.query.imdbID, 'nada');
     if (id === '') return res.status(400).send('El parámetro imdbID es obligatorio');
 
     const pelicula = await OMDBGetByImdbID(id);  
@@ -134,7 +136,7 @@ app.get('/alumnos', (req, res) => {
 //D2
 app.get('/alumnos/:dni', (req, res) => {
     // 🛡️ HELPER: Limpiamos el DNI
-    const dniBuscado = ValidacionesHelper.getStringOrDefault(req.params.dni, '');
+    const dniBuscado = ValidacionesHelper.getStringOrDefault(req.params.dni, 'nada');
     const alumnoEncontrado = alumnosArray.find(a => a.dni === dniBuscado); 
 
     if (alumnoEncontrado) {
@@ -147,8 +149,8 @@ app.get('/alumnos/:dni', (req, res) => {
 // D3
 app.post('/alumnos', (req, res) => {
     // 🛡️ HELPER: Validamos el Body del POST
-    const nombre = ValidacionesHelper.getStringOrDefault(req.body.nombre, '');
-    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, '');
+    const nombre = ValidacionesHelper.getStringOrDefault(req.body.nombre, 'nada');
+    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, 'nada');
     const edad = ValidacionesHelper.getIntegerOrDefault(req.body.edad, 0);
 
     if (nombre === '' || dni === '' || edad <= 0) {
@@ -163,7 +165,7 @@ app.post('/alumnos', (req, res) => {
 //D4
 app.delete('/alumnos', (req, res) => {
     // 🛡️ HELPER: Validamos el Body del DELETE
-    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, '');
+    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, 'nada');
     if (dni === '') return res.status(400).send("Debe enviar un DNI válido");
 
     const index = alumnosArray.findIndex(a => a.dni === dni);
