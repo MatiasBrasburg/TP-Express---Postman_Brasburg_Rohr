@@ -2,73 +2,47 @@ class ValidacionesHelper {
 
     getIntegerOrDefault = (value, defaultValue) => {
         let numeroConvertido = parseInt(value);
-
-        // 2. Evaluamos si el resultado NO es un número (NaN)
         if (isNaN(numeroConvertido)) {
-            // Falló: devolvemos el Plan B
             return defaultValue;
         } else {
-            // Tuvo éxito: devolvemos el número entero
             return numeroConvertido;
         }
-
-
     };
-
-
 
     getStringOrDefault = (value, defaultValue) => {
-        if (value === "estoEsUnString") {
-            return value
-        }
-        else {
-            return defaultValue
+        if (value === undefined || value === null) {
+            return defaultValue;
+        } else {
+            return String(value);
         }
     };
-
 
     getDateOrDefault = (value, defaultValue) => {
-        let nuevoValue = new date(value)
-        if (isNaN(nuevoValue.getTime())) {
-            return defaultValue
+        const fecha = new Date(value);
+        if (fecha instanceof Date && !isNaN(fecha.getTime())) {
+            return fecha;
         }
-        else {
-            return value
-        }
-
+        return defaultValue;
     };
-
 
     getBooleanOrDefault = (value, defaultValue) => {
+        if (typeof value === 'boolean') return value;
         if (typeof value === 'string') {
-
-            let textoMinuscula = value.toLowerCase();
-            if (value === "true") {
-                return true
-            }
-            else if (value === "false") {
-                return false
-            }
-            else { return defaultValue }
-
+            const texto = value.toLowerCase();
+            if (texto === "true") return true;
+            if (texto === "false") return false;
         }
-
+        return defaultValue;
     };
-    isEmail = (value) => {
 
+    isEmail = (value) => {
         if (typeof value !== 'string') {
             return false;
         }
-
-
-        const moldeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-        // Esto automáticamente devolverá true o false.
-        return moldeEmail.test(value);
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(value);
     };
 
 }
-
 
 export default new ValidacionesHelper();

@@ -6,7 +6,6 @@ import Alumno from "./alumno.js";
 import ValidacionesHelper from "./ValidacionesHelper.js"; // Asumo que lo guardaste en la misma carpeta base
 import DateTimeHelper from "./DateTimeHelper.js";
 
-
 const app = express();
 const port = 3000;            
 
@@ -95,33 +94,32 @@ app.get('/matematica/dividir', async (req, res) => {
 //c1
 app.get('/omdb/searchbypage', async (req, res) => {                
     // 🛡️ HELPER: Limpiamos la búsqueda y la página
-    const search = ValidacionesHelper.getStringOrDefault(req.query.search, 'nada');
+    const search = ValidacionesHelper.getStringOrDefault(req.query.search, '');
     const p = ValidacionesHelper.getIntegerOrDefault(req.query.p, 1);
 
     if (search === '') return res.status(400).send('El parámetro search es obligatorio');
 
     let resultado = await OMDBSearchByPage(search, p);     
-    res.status(200).json(resultado);
+    res.status(200).send(resultado);
 });
 
 //c2
 app.get('/omdb/searchcomplete', async (req, res) => {                
-    const search = ValidacionesHelper.getStringOrDefault(req.query.search, 'nada');
+    const search = ValidacionesHelper.getStringOrDefault(req.query.search, '');
     if (search === '') return res.status(400).send('El parámetro search es obligatorio');
 
     let resultado = await OMDBSearchComplete(search); 
-    res.status(200).json(resultado);
+    res.status(200).send(resultado);
 });
 
 //c3
 app.get('/omdb/getbyomdbid', async (req, res) => {
-    const id = ValidacionesHelper.getStringOrDefault(req.query.imdbID, 'nada');
+    const id = ValidacionesHelper.getStringOrDefault(req.query.imdbID, '');
     if (id === '') return res.status(400).send('El parámetro imdbID es obligatorio');
 
     const pelicula = await OMDBGetByImdbID(id);  
-    return res.status(200).json(pelicula);
+    return res.status(200).send(pelicula);
 });
-
 
 const alumnosArray = [];
 alumnosArray.push(new Alumno("Esteban Dido", "22888444", 20));
@@ -130,17 +128,17 @@ alumnosArray.push(new Alumno("Elba Calao", "32623391", 18));
 
 //D1
 app.get('/alumnos', (req, res) => {
-    return res.status(200).json(alumnosArray);  
+    return res.status(200).send(alumnosArray);  
 });
 
 //D2
 app.get('/alumnos/:dni', (req, res) => {
     // 🛡️ HELPER: Limpiamos el DNI
-    const dniBuscado = ValidacionesHelper.getStringOrDefault(req.params.dni, 'nada');
+    const dniBuscado = ValidacionesHelper.getStringOrDefault(req.params.dni, '');
     const alumnoEncontrado = alumnosArray.find(a => a.dni === dniBuscado); 
 
     if (alumnoEncontrado) {
-        return res.status(200).json(alumnoEncontrado);
+        return res.status(200).send(alumnoEncontrado);
     } else {
         return res.status(404).send("Alumno no encontrado");
     }
@@ -149,15 +147,15 @@ app.get('/alumnos/:dni', (req, res) => {
 // D3
 app.post('/alumnos', (req, res) => {
     // 🛡️ HELPER: Validamos el Body del POST
-    const nombre = ValidacionesHelper.getStringOrDefault(req.body.nombre, 'nada');
-    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, 'nada');
+    const username = ValidacionesHelper.getStringOrDefault(req.body.username, '');
+    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, '');
     const edad = ValidacionesHelper.getIntegerOrDefault(req.body.edad, 0);
 
-    if (nombre === '' || dni === '' || edad <= 0) {
-        return res.status(400).send('nombre, dni y edad son obligatorios y deben ser válidos');
+    if (username === '' || dni === '' || edad <= 0) {
+        return res.status(400).send('username, dni y edad son obligatorios y deben ser válidos');
     }
 
-    const nuevoAlumno = new Alumno(nombre, dni, edad);
+    const nuevoAlumno = new Alumno(username, dni, edad);
     alumnosArray.push(nuevoAlumno);
     return res.status(201).send("Alumno agregado correctamente");   
 });
@@ -165,7 +163,7 @@ app.post('/alumnos', (req, res) => {
 //D4
 app.delete('/alumnos', (req, res) => {
     // 🛡️ HELPER: Validamos el Body del DELETE
-    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, 'nada');
+    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, '');
     if (dni === '') return res.status(400).send("Debe enviar un DNI válido");
 
     const index = alumnosArray.findIndex(a => a.dni === dni);
@@ -176,6 +174,50 @@ app.delete('/alumnos', (req, res) => {
     } else {
         return res.status(404).send("No se encontró el alumno para eliminar");
     }
+});
+
+app.get('/fechas/isDate', (req, res) => {
+    const fecha = ValidacionesHelper.getDateOrDefault(req.query.fecha, null);
+    if (DateTimeHelper.isDate(fecha)) {
+        return res.status(400).send('Fecha inválida');
+    }
+    res.status(200).send({ valido: true });
+});
+
+app.get('/fechas/getEdadActual', (req, res) => {
+    const fechaNac = ValidacionesHelper.getDateOrDefault(req.query.fechaNacimiento, null);
+    if (DateTimeHelper.isDate(fechaNac)) {
+        return res.status(400).send('Fecha inválida');
+    }
+    res.status(200).send({ edad: DateTimeHelper.getEdadActual(fechaNac) });
+});
+
+app.get('/fechas/getDiasHastaMiCumple', (req, res) => {
+    const fechaNac = ValidacionesHelper.getDateOrDefault(req.query.fechaNacimiento, null);
+    if (DateTimeHelper.isDate(fechaNac)) {
+        return res.status(400).send('Fecha inválida');
+    }
+    res.status(200).send({ diasRestantes: DateTimeHelper.getDiasHastaMiCumple(fechaNac) });
+});
+
+app.get('/fechas/getDiaTexto', (req, res) => {
+    const fecha = ValidacionesHelper.getDateOrDefault(req.query.fecha, null);
+    const abr = ValidacionesHelper.getBooleanOrDefault(req.query.abr, false);
+    
+    if (!DateTimeHelper.isDate(fecha)) {
+        return res.status(400).send('Fecha inválida');
+    }
+    res.status(200).send({ dia: DateTimeHelper.getDiaTexto(fecha, abr) });
+});
+
+app.get('/fechas/getMesTexto', (req, res) => {
+    const fecha = ValidacionesHelper.getDateOrDefault(req.query.fecha, null);
+    const abr = ValidacionesHelper.getBooleanOrDefault(req.query.abr, false);
+    
+    if (DateTimeHelper.isDate(fecha)) {
+        return res.status(400).send('Fecha inválida');
+    }
+    res.status(200).send({ mes: DateTimeHelper.getMesTexto(fecha, abr) });
 });
 
 app.listen(port, () => {
